@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2 style="display:flex;justify-content:space-between;align-items:center;">
+    Reverse Proxies
+    <a href="{{ url_for('main.create_host') }}" class="btn btn-success">➕ Add Host</a>
+</h2>
+
+{% if grouped_hosts %}
+  {% for domain, hosts in grouped_hosts.items() %}
+    <h3 style="margin-top:1.5rem;">{{ domain }}</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Host</th><th>Upstreams</th><th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for h in hosts %}
+        <tr>
+          <td>{{ h.host }}</td>
+          <td>
+            {% for u in h.upstreams %}
+              {{ u.dial }}{% if not loop.last %}, {% endif %}
+            {% endfor %}
+          </td>
+          <td>
+            <a href="{{ url_for('main.edit_host', host=h.host) }}" class="btn btn-sm">✏️</a>
+
+            <form method="POST"
+                  action="{{ url_for('main.delete_host', host=h.host) }}"
+                  style="display:inline;"
+                  onsubmit="return confirm('Delete {{h.host}}?');">
+              <button class="btn btn-danger btn-sm">🗑</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% endfor %}
+{% else %}
+  <p>No reverse proxies configured.</p>
+{% endif %}
+
+{% endblock %}

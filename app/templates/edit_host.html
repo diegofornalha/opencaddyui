@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Edit Reverse Proxy - {{ host.host }}</h2>
+
+<form method="POST" action="{{ url_for('main.edit_host', host=host.host) }}">
+    <div class="form-group">
+        <label for="host">Host (Domain)</label>
+        <input type="text" id="host" name="host" value="{{ host.host }}" required>
+    </div>
+
+    <div class="form-group">
+        <label for="upstreams">Upstreams (comma separated)</label>
+        <input type="text" id="upstreams" name="upstreams" value="{% for u in host.upstreams %}{{ u.dial }}{% if not loop.last %}, {% endif %}{% endfor %}" required>
+    </div>
+
+    <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Save</button>
+        <a href="{{ url_for('main.dashboard') }}" class="btn btn-secondary">Cancel</a>
+    </div>
+</form>
+
+<form method="POST" action="{{ url_for('main.delete_host', host=host.host) }}" onsubmit="return confirm('Are you sure you want to delete this host?');">
+    <button type="submit" class="btn btn-danger" style="margin-top: 1rem;">Delete Host</button>
+</form>
+
+{% endblock %}
