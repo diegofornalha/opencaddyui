@@ -108,3 +108,9 @@ docker-compose up -d --build
 ```
 
 Now, your caddy web UI should be available at localhost:5000. 
+
+
+## Screenshots
+![Screenshot From 2025-05-01 23-23-33](https://github.com/user-attachments/assets/aae4885b-8467-401f-af60-1325a8309e5f)
+![Screenshot From 2025-05-01 23-23-17](https://github.com/user-attachments/assets/9a744f6b-4441-463c-a1fb-75c165e6c6e3)
+![Screenshot From 2025-05-01 23-23-07](https://github.com/user-attachments/assets/03207d3f-f7e9-4000-b205-c4c566f276cd)
