@@ -1,13 +1,16 @@
+version: '3'
+
 services:
-  web:
+  app:
     build: .
-    env_file:
-      - .env
     ports:
       - "5000:5000"
     volumes:
-      - ./data/db:/app/instance  # Persistent SQLite storage
-      - ./data/configs:/app/configs    # Caddy config backups
-      - ./debug_files:/app/debug
+      - .:/app
+    environment:
+      - CADDY_ADMIN_API=http://host.docker.internal:2019
+      - STREAMLIT_SERVER_PORT=5000
+      - STREAMLIT_SERVER_HEADLESS=true
+      - STREAMLIT_SERVER_ENABLE_CORS=true
     restart: unless-stopped
 

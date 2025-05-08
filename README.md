@@ -1,116 +1,59 @@
-# Caddy Web UI
+# OpenCaddyUI
 
-A web interface for managing Caddy reverse proxies using the admin API.
-This is a little weird coming from me since I like working in a terminal. 
-But sometimes I want to test something quick, maybe on my phone, and want to be
-able to access caddy through aweb UI.
+Uma interface web simples para gerenciar configurações do servidor Caddy, agora com Streamlit!
 
-## Assumption
-This assumes that you have Caddy already installed. The default assumes Caddy is installed on 
-localhost, this is configuratble via .env file. 
+## Sobre
 
-## A little background context
-My current caddyfile (I use a flat file) looks like this:
+OpenCaddyUI permite gerenciar facilmente configurações de proxy reverso do [Caddy Server](https://caddyserver.com/), mostrando todos os hosts de proxy configurados, permitindo adicionar novos, editar ou remover existentes, além de controle de versão das configurações.
 
-```
-##################################################################
-# Globals
-##################################################################
-{
-        acme_dns cloudflare {env.CLOUDFLARE_AUTH_TOKEN}
-        admin localhost:2019
-}
+## Características
 
-(common) {
-        header /* {
-                -Server
-                -X-Powered-By
-                +X-Content-Type-Options nosniff
-                +Strict-Transport-Security "max-age=63072000 includeSubDomains preload"
-        }
-}
+- Interface moderna com Streamlit
+- Visualização de todos os hosts de proxy configurados
+- Adição, edição e remoção de hosts
+- Controle de versão das configurações
+- Autenticação de usuários
+- Integração direta com a API do Caddy
 
-(cors) {
-        @cors_preflight{args[0]} method OPTIONS
-        @cors{args[0]} header Origin {args[0]}
-        # "{args[0]}" is an input value used when calling the snippet
+## Requisitos
 
-        handle @cors_preflight{args[0]} {
-                header {
-                        Access-Control-Allow-Origin "{args[0]}"
-                        Access-Control-Allow-Methods "GET, POST, PUT, PATCH, DELETE"
-                        Access-Control-Allow-Headers *
-                        Access-Control-Max-Age "3600"
-                        defer
-                }
-                respond "" 204
-        }
-        handle @cors{args[0]} {
-                header {
-                        Access-Control-Allow-Origin "{args[0]}"
-                        Access-Control-Expose-Headers *
-                        defer
-                }
-        }
-}
+- Python 3.8+
+- Caddy Server 2.x com API Admin ativada
+- PostgreSQL 
 
+## 
 
-(log) {
-        log {
-                output file /var/log/caddy/{args[0]}_access.log {
-                        roll_size 100mb
-                        roll_keep 10
-                        roll_keep_for 2160h
-                }
-        }
-}
-##################################################################
-# Hosts
-##################################################################
-nextcloud.xyz.com {
-        import common
-        import cors xyz.com
-        reverse_proxy 10.0.0.10:1111
-        import log nextcloud
-}
-mail.xyz.com {
-        import common
-        import cors xyz.com
-        reverse_proxy 10.0.0.11:2525
-        import log mail
-}
-```
-
-So, adding/removing hosts is not that bad. 
-
-## Features
-
-Caddy API uses JSON. We're parsing the posting JSON data to the ADMIN API endpoint. We have
-calls to add/remove/edit hosts and rollback whole set of changes.
-
-Users can:
-
-- View all reverse proxies
-- Edit individual hosts
-- Add new host
-- Configuration versioning for rollbacks
-- User authentication
-
-## Setup
-
-1. Make sure you have Docker and Docker Compose installed
-2. Clone this repository
-3. Copy .env.example to `.env` and edit it with your configuration (copy from `config.ini`)
-4. Build and run with Docker Compose:
-
+1. Crie um ambiente virtual e instale as dependências:
 ```bash
-docker-compose up -d --build
+python -m venv .venv
+source .venv/bin/activate 
+pip install -r requirements.txt
 ```
 
-Now, your caddy web UI should be available at localhost:5000. 
+2. Configure o banco de dados no arquivo `config.ini`:
+```ini
+[database]
+SQLALCHEMY_DATABASE_URI = postgresql://usuario:senha@localhost:5432/caddyui
+```
 
+4. Execute o aplicativo:
+```bash
+python run.py
+```
 
-## Screenshots
-![Screenshot From 2025-05-01 23-23-33](https://github.com/user-attachments/assets/aae4885b-8467-401f-af60-1325a8309e5f)
-![Screenshot From 2025-05-01 23-23-17](https://github.com/user-attachments/assets/9a744f6b-4441-463c-a1fb-75c165e6c6e3)
-![Screenshot From 2025-05-01 23-23-07](https://github.com/user-attachments/assets/03207d3f-f7e9-4000-b205-c4c566f276cd)
+5. Acesse a interface web em `http://localhost:5000`
+
+## Configuração
+
+As principais configurações estão no arquivo `config.ini`, onde você pode definir:
+
+- URL da API Admin do Caddy (CADDY_ADMIN_API)
+- String de conexão do banco de dados (SQLALCHEMY_DATABASE_URI)
+- Chave secreta para segurança (SECRET_KEY)
+
+## Uso
+
+1. Faça login com o usuário admin (senha padrão no arquivo secrets/admin_password.txt)
+2. No dashboard, visualize todos os hosts configurados
+3. Adicione novos hosts ou edite/remova existentes
+4. Acesse o histórico de versões para reverter configurações anteriores
